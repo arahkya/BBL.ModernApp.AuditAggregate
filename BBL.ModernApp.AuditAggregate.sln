@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBL.ModernApp.AuditAggregate.Client", "BBL.ModernApp.AuditAggregate.Client\BBL.ModernApp.AuditAggregate.Client.csproj", "{3B107D39-C9FE-4DB3-8376-CD41E0562F9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBL.ModernApp.AuditAggregate.Client", "BBL.ModernApp.AuditAggregate.Client\BBL.ModernApp.AuditAggregate.Client.csproj", "{3B107D39-C9FE-4DB3-8376-CD41E0562F9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppProduce", "ConsoleAppProduce\ConsoleAppProduce.csproj", "{F066643F-73D4-4CA1-A841-2A1F0DB6B842}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3B107D39-C9FE-4DB3-8376-CD41E0562F9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B107D39-C9FE-4DB3-8376-CD41E0562F9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B107D39-C9FE-4DB3-8376-CD41E0562F9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F066643F-73D4-4CA1-A841-2A1F0DB6B842}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F066643F-73D4-4CA1-A841-2A1F0DB6B842}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F066643F-73D4-4CA1-A841-2A1F0DB6B842}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F066643F-73D4-4CA1-A841-2A1F0DB6B842}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

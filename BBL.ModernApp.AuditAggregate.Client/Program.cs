@@ -1,88 +1,71 @@
-﻿using Confluent.Kafka;
-using System.Data.SqlClient;
+﻿using BBL.ModernApp.AuditAggregate.Client;
+using Confluent.Kafka;
 using System.Net;
 
+Queue<PayloadMessage> queue = new();
 
-Action<string> writeLog = (message) =>
-{
-    Console.WriteLine($"{DateTime.Now.ToString()} - {message}");
-};
-
-writeLog("Begin Listen to MFHost");
+LogWriter.Write("Begin Listen to MFHost");
 
 ConsumerConfig config = new()
 {
     BootstrapServers = "kafka01:9092",
     ClientId = Dns.GetHostName(),
     AutoOffsetReset = AutoOffsetReset.Latest,
-    GroupId = "audit_client_01"
+    GroupId = "audit_client_01",
 };
 
-ConsumerBuilder<Ignore, string> consumerBuilder = new(config);
+ConsumerBuilder<Ignore, PayloadMessage> builder = new(config);
+builder.SetValueDeserializer(new PayloadMessageSerializer());
 
-using IConsumer<Ignore, string> consumer = consumerBuilder.Build();
+using IConsumer<Ignore, PayloadMessage> consumer = builder.Build();
+
 consumer.Subscribe("MFHost");
 
-
-await Task.Run(() =>
+Task consumeTask = Task.Run(() =>
 {
     while (true)
     {
-        ConsumeResult<Ignore, string>? result = null;
+        ConsumeResult<Ignore, PayloadMessage>? result = null;
 
         try
         {
-            writeLog("Listen");
+            LogWriter.Write("Listen");
 
             result = consumer.Consume();
 
-            writeLog($"Got Message. ({result.Message.Value})");
+            LogWriter.Write($"Got Message. ({result.Message.Value})");
 
-            Task.Run(async () =>
-            {                
-                SqlConnection sqlConnection = new ("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=bblaudit;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
-                SqlCommand command = sqlConnection.CreateCommand();
-                command.CommandText = "insert into dbo.bblaudit(CreatedOn,Id,Source,Message) values(@createDate, @id, @source, @message)";
-
-                SqlParameter createDateParam = command.CreateParameter();
-                SqlParameter idParam = command.CreateParameter();
-                SqlParameter sourceParam = command.CreateParameter();
-                SqlParameter messageParam = command.CreateParameter();
-
-                createDateParam.ParameterName = "@createDate";
-                idParam.ParameterName = "@id";
-                sourceParam.ParameterName = "@source";
-                messageParam.ParameterName = "@message";
-
-                createDateParam.Value = DateTime.Now;
-                idParam.Value = Guid.NewGuid().ToString();
-                sourceParam.Value = "MFHost";
-                messageParam.Value = result.Message.Value!;
-
-                command.Parameters.Add(createDateParam);
-                command.Parameters.Add(idParam);
-                command.Parameters.Add(sourceParam);
-                command.Parameters.Add(messageParam);
-
-                try
-                {
-                    await command.Connection.OpenAsync();
-                    await command.ExecuteNonQueryAsync();
-                    await command.Connection.CloseAsync();
-
-                    writeLog($"Processed Message ({result.Message.Value})");
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            });            
+            queue.Enqueue(result.Message.Value);
         }
         catch
         {
-            writeLog($"Error on Message ({result?.Message.Value ?? "N/A"})");
+            LogWriter.Write($"Error on Message ({result?.Message.Value.OperationName ?? "N/A"})");
         }
-    }    
+    }
+});
+Task workTask = Task.Run(async () =>
+{
+    while (true)
+    {
+        if (!queue.Any())
+        {
+            Task.Delay(1000).Wait();
+            continue;
+        }
+
+        PayloadMessage message = queue.Dequeue();
+
+        try
+        {
+            await DbDealer.SaveAsync(message);
+        }
+        catch
+        {
+            queue.Enqueue(message);
+        }
+    }
 });
 
-writeLog("Exit");
+await Task.WhenAll(new[] { consumeTask, workTask });
+
+LogWriter.Write("Exit");
