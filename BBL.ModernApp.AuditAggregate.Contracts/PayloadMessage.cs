@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -6,67 +7,70 @@ namespace BBL.ModernApp.AuditAggregate.Contracts
 {
     public sealed class PayloadMessage
     {        
-        [MaxLength(50)]
+        [StringLength(50)]
         public string? SessionID { get; internal set; }
 
         public DateTime OperationDateTime { get; internal set; } = DateTime.MinValue;
 
-        [MaxLength(32)]
+        [Required]
+        [StringLength(32)]
         public string OperationName { get; internal set; } = null!;
 
-        [MaxLength(32)]
+        [Required]
+        [StringLength(32)]
         public string CustomerID { get; internal set; } = null!;
 
-        [MaxLength(50)]
+        [Required]
+        [StringLength(50)]
         public string Channel { get; internal set; } = null!;
 
-        [MaxLength(50)]
+        [StringLength(50)]
         public string? SubChannel { get; internal set; }
                 
         public Int32? DeviceID { get; internal set; }
 
-        [MaxLength(32)]
+        [StringLength(32)]
         public string? IPAddress { get; internal set; }
 
         public bool Succeeded { get; internal set; }
 
-        [MaxLength(255)]
+        [StringLength(255)]
         public string? ErrorCode { get; internal set; }
 
-        [MaxLength(100)]
+        [StringLength(100)]
         public string? Info1 { get; internal set; }
 
-        [MaxLength(100)]
+        [StringLength(100)]
         public string? Info2 { get; internal set; }
 
-        [MaxLength(100)]
+        [StringLength(100)]
         public string? Info3 { get; internal set; }
 
-        [MaxLength(100)]
+        [StringLength(100)]
         public string? Info4 { get; internal set; }
 
-        [MaxLength(100)]
+        [StringLength(100)]
         public string? Info5 { get; internal set; }
 
-        [MaxLength(100)]
+        [StringLength(100)]
         public string? Info6 { get; internal set; }
 
-        [MaxLength(255)]
+        [StringLength(255)]
         public string? Info7 { get; internal set; }
 
-        [MaxLength(255)]
+        [StringLength(255)]
         public string? Info8 { get; internal set; }
 
-        [MaxLength(255)]
+        [StringLength(255)]
         public string? Info9 { get; internal set; }
 
-        [MaxLength(255)]
+        [StringLength(255)]
         public string? Info10 { get; internal set; }
 
-        [MaxLength(255)]
+        [StringLength(255)]
         public string? Keyword { get; internal set; }
 
-        [MaxLength(1000)]
+        [StringLength(1000)]
         public string? DisplayMessage { get; internal set; } = null!;
 
         [JsonConstructor]
@@ -162,7 +166,9 @@ namespace BBL.ModernApp.AuditAggregate.Contracts
             ValidationContext validationContext = new(this);
             List<ValidationResult> validationResult = new();
 
-            if(OperationDateTime == DateTime.MinValue)
+            isValid = Validator.TryValidateObject(this, validationContext, validationResult, true);
+
+            if (OperationDateTime == DateTime.MinValue)
             {
                 validationResult.Add(new ValidationResult("Cannot equal to DateTime.MinValue", new[] { nameof(OperationDateTime) }));
             }
@@ -170,8 +176,8 @@ namespace BBL.ModernApp.AuditAggregate.Contracts
             if(IPAddress != null)
             {
                 try
-                {
-                    Uri _ = new (IPAddress);
+                {                    
+                    Uri _ = new ($"http://{IPAddress}");
                 }
                 catch
                 {
@@ -179,7 +185,7 @@ namespace BBL.ModernApp.AuditAggregate.Contracts
                 }
             }
 
-            isValid = Validator.TryValidateObject(this, validationContext, validationResult);
+            isValid = !validationResult.Any();
 
             return validationResult;
         }
