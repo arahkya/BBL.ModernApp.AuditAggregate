@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace BBL.ModernApp.AuditAggregate.Contracts
 {
-    internal class PayloadJsonConverter : JsonConverter<PayloadMessage>
+    internal sealed class PayloadJsonConverter : JsonConverter<PayloadMessage>
     {
         public override PayloadMessage? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

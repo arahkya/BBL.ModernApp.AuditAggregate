@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace BBL.ModernApp.AuditAggregate.Contracts
 {
-    public class PayloadMessage
+    public sealed class PayloadMessage
     {
         public string? SessionID { get; internal set; }
         public DateTime OperationDateTime { get; internal set; }
