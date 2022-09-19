@@ -5,7 +5,9 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBL.ModernApp.AuditAggregate.Client", "BBL.ModernApp.AuditAggregate.Client\BBL.ModernApp.AuditAggregate.Client.csproj", "{3B107D39-C9FE-4DB3-8376-CD41E0562F9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppProduce", "ConsoleAppProduce\ConsoleAppProduce.csproj", "{F066643F-73D4-4CA1-A841-2A1F0DB6B842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleAppProduce", "ConsoleAppProduce\ConsoleAppProduce.csproj", "{F066643F-73D4-4CA1-A841-2A1F0DB6B842}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BBL.ModernApp.AuditAggregate.Contracts", "BBL.ModernApp.AuditAggregate.Contracts\BBL.ModernApp.AuditAggregate.Contracts.csproj", "{2C84C0BD-7F77-4C3F-B788-1613A5B5FF7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F066643F-73D4-4CA1-A841-2A1F0DB6B842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F066643F-73D4-4CA1-A841-2A1F0DB6B842}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F066643F-73D4-4CA1-A841-2A1F0DB6B842}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C84C0BD-7F77-4C3F-B788-1613A5B5FF7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C84C0BD-7F77-4C3F-B788-1613A5B5FF7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C84C0BD-7F77-4C3F-B788-1613A5B5FF7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C84C0BD-7F77-4C3F-B788-1613A5B5FF7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

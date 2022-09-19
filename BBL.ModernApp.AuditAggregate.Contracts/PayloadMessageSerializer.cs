@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace BBL.ModernApp.AuditAggregate.Client
+namespace BBL.ModernApp.AuditAggregate.Contracts
 {
     public class PayloadMessageSerializer : ISerializer<PayloadMessage>, IDeserializer<PayloadMessage>
     {
@@ -19,7 +19,10 @@ namespace BBL.ModernApp.AuditAggregate.Client
         {
             string json = Encoding.UTF8.GetString(data);
 
-            PayloadMessage? payloadMessage = JsonSerializer.Deserialize<PayloadMessage>(json);
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            options.Converters.Add(new PayloadJsonConverter());
+
+            PayloadMessage? payloadMessage = JsonSerializer.Deserialize<PayloadMessage>(json, options);
 
             if (payloadMessage == null)
             {

@@ -1,4 +1,5 @@
 ﻿using BBL.ModernApp.AuditAggregate.Client;
+using BBL.ModernApp.AuditAggregate.Contracts;
 using Confluent.Kafka;
 using System.Net;
 

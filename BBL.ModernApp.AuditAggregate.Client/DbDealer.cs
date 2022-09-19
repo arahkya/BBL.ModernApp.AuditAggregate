@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using BBL.ModernApp.AuditAggregate.Contracts;
+using System.Data.SqlClient;
 using System.Reflection;
 
 namespace BBL.ModernApp.AuditAggregate.Client
@@ -29,7 +30,7 @@ namespace BBL.ModernApp.AuditAggregate.Client
         {
             PropertyInfo[] props = message.GetType().GetProperties();
 
-            foreach (SqlParameter param in Command.Parameters)
+            foreach ( SqlParameter param in Command.Parameters)
             {
                 string columnName = param.ParameterName.Remove(0, 1);
                 param.Value = props.Single(p => p.Name == columnName).GetValue(message) ?? DBNull.Value;
