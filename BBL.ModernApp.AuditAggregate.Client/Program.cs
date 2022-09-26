@@ -1,72 +1,45 @@
-﻿using BBL.ModernApp.AuditAggregate.Client;
+﻿using BBL.ModernApp.AuditAggregate.Client.Config;
+using BBL.ModernApp.AuditAggregate.Client.Data;
 using BBL.ModernApp.AuditAggregate.Contracts;
-using Confluent.Kafka;
-using System.Net;
+using BBL.ModernApp.AuditAggregate.Workers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Channels;
 
-Queue<PayloadMessage> queue = new();
-
-LogWriter.Write("Begin Listen to MFHost");
-
-ConsumerConfig config = new()
+public class Program
 {
-    BootstrapServers = "kafka01:9092",
-    ClientId = Dns.GetHostName(),
-    AutoOffsetReset = AutoOffsetReset.Latest,
-    GroupId = "audit_client_01",
-};
-
-ConsumerBuilder<Ignore, PayloadMessage> builder = new(config);
-builder.SetValueDeserializer(new PayloadMessageSerializer());
-
-using IConsumer<Ignore, PayloadMessage> consumer = builder.Build();
-
-consumer.Subscribe("MFHost");
-
-Task consumeTask = Task.Run(() =>
-{
-    while (true)
+    public static void Main(string[] agrs)
     {
-        ConsumeResult<Ignore, PayloadMessage>? result = null;
+        ConfigurationBuilder configBuilder = new();
+        string appsettingsFilePath = Path.Join(Environment.CurrentDirectory, "Config", "appsettings.json");
+        configBuilder.AddJsonFile(appsettingsFilePath, false, true);
 
-        try
+        ClientOption clientOption = new();
+        IConfigurationRoot configure = configBuilder.Build();
+        configure.Bind(clientOption);
+
+        ServiceCollection services = new ServiceCollection();
+        services.AddSingleton<Channel<PayloadMessage>>((ServiceProvider) => Channel.CreateUnbounded<PayloadMessage>());
+        services.AddScoped<ClientOption>((serviceProvider) => clientOption);
+        services.AddScoped<DbDealer>();
+        services.AddSingleton<ListenerWorker>();
+        services.AddSingleton<MessageWorker>();
+
+        IServiceProvider _services = services.BuildServiceProvider();
+
+        Console.WriteLine("Begin");
+
+        ListenerWorker listener = _services.GetRequiredService<ListenerWorker>();
+        MessageWorker databaseWorker = _services.GetRequiredService<MessageWorker>();
+        AppDomain.CurrentDomain.ProcessExit += (s, e) =>
         {
-            LogWriter.Write("Listen");
+            listener.Stop();
+            databaseWorker.Stop();
+            Console.WriteLine("End");
+        };
 
-            result = consumer.Consume();
-
-            LogWriter.Write("Got Message");
-
-            queue.Enqueue(result.Message.Value);
-        }
-        catch
-        {
-            LogWriter.Write($"Error on Message ({result?.Message.Value.OperationName ?? "N/A"})");
-        }
+        listener.Start();
+        databaseWorker.Start();
+        Console.Read();
     }
-});
-Task workTask = Task.Run(async () =>
-{
-    while (true)
-    {
-        if (!queue.Any())
-        {
-            Task.Delay(1000).Wait();
-            continue;
-        }
-
-        PayloadMessage message = queue.Dequeue();
-
-        try
-        {
-            await DbDealer.SaveAsync(message);
-        }
-        catch
-        {
-            queue.Enqueue(message);
-        }
-    }
-});
-
-await Task.WhenAll(new[] { consumeTask, workTask });
-
-LogWriter.Write("Exit");
+}
