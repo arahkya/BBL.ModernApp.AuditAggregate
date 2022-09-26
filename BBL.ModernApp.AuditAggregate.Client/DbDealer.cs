@@ -1,5 +1,6 @@
 ﻿using BBL.ModernApp.AuditAggregate.Contracts;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Reflection;
 
@@ -48,7 +49,7 @@ namespace BBL.ModernApp.AuditAggregate.Client
 
                 LogWriter.Write($"Processed Message ({message.DisplayMessage})");
             }
-            catch (Exception ex)
+            catch (DbException ex)
             {
                 throw ex;
             }
