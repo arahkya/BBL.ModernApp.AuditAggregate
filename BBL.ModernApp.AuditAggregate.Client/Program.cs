@@ -34,7 +34,7 @@ Task consumeTask = Task.Run(() =>
 
             result = consumer.Consume();
 
-            LogWriter.Write($"Got Message. ({result.Message.Value})");
+            LogWriter.Write("Got Message");
 
             queue.Enqueue(result.Message.Value);
         }

@@ -21,7 +21,7 @@ while (true)
 
     string? userEntry = Console.ReadLine();
 
-    if (string.IsNullOrEmpty(userEntry)) continue;
+    if (string.IsNullOrEmpty(userEntry)) continue;    
 
     var payloadMessage = PayloadMessage.New("TestAudiLog", 
         DateTime.Now, 

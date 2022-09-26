@@ -1,5 +1,16 @@
-﻿drop table dbo.bblaudit
-create table dbo.bblaudit
+﻿IF NOT EXISTS (SELECT * FROM sys.Databases where Name = 'bbldevdb')
+BEGIN
+    CREATE DATABASE bbldevdb
+    ON (NAME=bbldevdb_dat,FILENAME="/bbl/bbldevdb.mdf")
+    LOG ON(NAME=bbldevdb_log,FILENAME="/bbl/bbldevdb.ldf")
+END
+GO
+
+USE bbldevdb;
+GO
+
+DROP TABLE IF EXISTS dbo.bblaudit
+CREATE TABLE dbo.bblaudit
 (
 	SessionID nvarchar(50) null
     , OperationDateTime datetime not null
@@ -24,3 +35,4 @@ create table dbo.bblaudit
     , Keyword nvarchar(255) null
     , DisplayMessage nvarchar(1000) null
 )
+GO

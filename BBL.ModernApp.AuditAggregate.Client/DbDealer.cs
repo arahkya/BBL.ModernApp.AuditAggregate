@@ -1,4 +1,5 @@
 ﻿using BBL.ModernApp.AuditAggregate.Contracts;
+using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
 
@@ -14,39 +15,42 @@ namespace BBL.ModernApp.AuditAggregate.Client
             {
                 if (_command == null)
                 {
-                    SqlConnection connection = new ("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=bblaudit;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
-                    SqlDataAdapter adapter = new("select * from dbo.bblaudit", connection);
-                    SqlCommandBuilder commandBuilder = new(adapter);
-                    _command = commandBuilder.GetInsertCommand(true);
+                    SqlConnection connection = new("Data Source=.,1433;Initial Catalog=bbldevdb;User ID=SA;Password=Password123;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                    
+                    _command = connection.CreateCommand();
+                    _command.CommandText = "AddAuditLog";
+                    _command.CommandType = CommandType.StoredProcedure;
                 }
 
                 return _command;
             }
         }
 
-
-
         public static async Task SaveAsync(PayloadMessage message)
         {
             PropertyInfo[] props = message.GetType().GetProperties();
 
-            foreach ( SqlParameter param in Command.Parameters)
-            {
-                string columnName = param.ParameterName.Remove(0, 1);
-                param.Value = props.Single(p => p.Name == columnName).GetValue(message) ?? DBNull.Value;
-            }
-
             try
             {
+                Command.Parameters.Clear();
+                foreach (PropertyInfo param in props)
+                {
+                    SqlParameter commandParam = Command.CreateParameter();
+                    commandParam.ParameterName = $"@{param.Name}";
+                    commandParam.Value = props.Single(p => p.Name == param.Name).GetValue(message) ?? DBNull.Value;
+
+                    Command.Parameters.Add(commandParam);
+                }
+
                 await Command.Connection.OpenAsync();
                 await Command.ExecuteNonQueryAsync();
-                
+
 
                 LogWriter.Write($"Processed Message ({message.DisplayMessage})");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             finally
             {
