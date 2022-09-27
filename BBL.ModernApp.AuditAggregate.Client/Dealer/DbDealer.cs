@@ -1,13 +1,14 @@
 ﻿using BBL.ModernApp.AuditAggregate.Client.Config;
 using BBL.ModernApp.AuditAggregate.Contracts;
+using Serilog;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Reflection;
 
-namespace BBL.ModernApp.AuditAggregate.Client.Data;
+namespace BBL.ModernApp.AuditAggregate.Client.Dealer;
 
-public class DbDealer
+public class DbDealer : IDealer
 {
     private SqlCommand? _command;
     private readonly DataOption _dataOption;
@@ -55,12 +56,12 @@ public class DbDealer
 
             if (effectedRows > 0)
             {
-                LogWriter.Write($"Processed Message ({message.DisplayMessage})");
+                Log.Information($"Saved Message ({message.DisplayMessage})");
             }
         }
         catch (DbException ex)
         {
-            throw ex;
+            Log.Error(ex.Message);
         }
         finally
         {

@@ -4,6 +4,7 @@ using System.Threading.Channels;
 using BBL.ModernApp.AuditAggregate.Client.Config;
 using BBL.ModernApp.AuditAggregate.Contracts;
 using Confluent.Kafka;
+using Serilog;
 
 namespace BBL.ModernApp.AuditAggregate.Workers;
 
@@ -32,12 +33,12 @@ public class ListenerWorker
         _bgWorker.CancelAsync();
         _bgWorker.Dispose();
 
-        Console.WriteLine("Stoped");
+        Log.Information("Stoped");
     }
 
     public void Start()
     {
-        Console.WriteLine("Running");
+        Log.Information("Running");
         _bgWorker.RunWorkerAsync();
     }
 
@@ -64,6 +65,8 @@ public class ListenerWorker
             ConsumeResult<Ignore, PayloadMessage> result = _consumer.Consume();
             
             await _dataChannel.Writer.WriteAsync(result.Message.Value);
+
+            Log.Information("Receiving Message...");
         }
     }
 }

@@ -1,8 +1,9 @@
 using System.ComponentModel;
 using System.Threading.Channels;
 using BBL.ModernApp.AuditAggregate.Client.Config;
-using BBL.ModernApp.AuditAggregate.Client.Data;
+using BBL.ModernApp.AuditAggregate.Client.Dealer;
 using BBL.ModernApp.AuditAggregate.Contracts;
+using Serilog;
 
 namespace BBL.ModernApp.AuditAggregate.Workers;
 
@@ -36,7 +37,7 @@ public class MessageWorker
         {
             while (_dataChannel.Reader.TryRead(out PayloadMessage? payloadMessage))
             {
-                Console.WriteLine(payloadMessage?.DisplayMessage ?? "N/A");
+                Log.Information($"Processing Message ({payloadMessage?.DisplayMessage ?? "N/A"})");
 
                 Thread threadProcess = new Thread(startThreadDbDealer);
                 threadProcess.Start((object?)payloadMessage);

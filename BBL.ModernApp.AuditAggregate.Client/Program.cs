@@ -1,17 +1,24 @@
 ﻿using BBL.ModernApp.AuditAggregate.Client.Config;
-using BBL.ModernApp.AuditAggregate.Client.Data;
+using BBL.ModernApp.AuditAggregate.Client.Dealer;
 using BBL.ModernApp.AuditAggregate.Contracts;
 using BBL.ModernApp.AuditAggregate.Workers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Channels;
+using Serilog;
 
 public class Program
 {
     public static void Main(string[] agrs)
     {
+        string appsettingsFilePath = Path.Join(Environment.CurrentDirectory, "appsettings.json");
+
+        if (agrs.FirstOrDefault() != null)
+        {
+            appsettingsFilePath = agrs.First();
+        }
+
         ConfigurationBuilder configBuilder = new();
-        string appsettingsFilePath = Path.Join(Environment.CurrentDirectory, "Config", "appsettings.json");
         configBuilder.AddJsonFile(appsettingsFilePath, false, true);
 
         ClientOption clientOption = new();
@@ -27,7 +34,12 @@ public class Program
 
         IServiceProvider _services = services.BuildServiceProvider();
 
-        Console.WriteLine("Begin");
+        using var log = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
+        Log.Logger = log;
+
+        Log.Information("Begin");
 
         ListenerWorker listener = _services.GetRequiredService<ListenerWorker>();
         MessageWorker databaseWorker = _services.GetRequiredService<MessageWorker>();
@@ -35,7 +47,7 @@ public class Program
         {
             listener.Stop();
             databaseWorker.Stop();
-            Console.WriteLine("End");
+            Log.Information("End");
         };
 
         listener.Start();
