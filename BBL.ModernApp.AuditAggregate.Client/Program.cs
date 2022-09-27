@@ -15,7 +15,7 @@ public class Program
 
         if (agrs.FirstOrDefault() != null)
         {
-            appsettingsFilePath = agrs.First();
+            appsettingsFilePath = Path.Join(Environment.CurrentDirectory, agrs.First());
         }
 
         ConfigurationBuilder configBuilder = new();

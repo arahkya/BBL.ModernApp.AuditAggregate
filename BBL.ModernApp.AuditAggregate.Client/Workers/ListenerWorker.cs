@@ -33,7 +33,7 @@ public class ListenerWorker
         _bgWorker.CancelAsync();
         _bgWorker.Dispose();
 
-        Log.Information("Stoped");
+        Log.Information("Stopped");
     }
 
     public void Start()

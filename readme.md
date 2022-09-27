@@ -21,3 +21,7 @@
    >```docker exec -it mssql-local /opt/mssql-tools/bin/sqlcmd -U sa -P Password123 -S localhost -i /bbl/table.sql```
 2. Create procedure
    >```docker exec -it mssql-local /opt/mssql-tools/bin/sqlcmd -U sa -P Password123 -S localhost -i /bbl/procedure.sql```
+
+### Build The Client
+**OSX**
+```dotnet build -c Release -o app -r osx.12-x64 --no-self-contained```
