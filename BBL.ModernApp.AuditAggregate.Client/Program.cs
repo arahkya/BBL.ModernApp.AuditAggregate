@@ -11,7 +11,12 @@ public class Program
 {
     public static void Main(string[] agrs)
     {
+#if DEBUG 
+        string projectPath = Path.GetFullPath("../../../", Environment.CurrentDirectory);
+        string appsettingsFilePath = Path.Join(projectPath, "appsettings.develop.json");
+#else
         string appsettingsFilePath = Path.Join(Environment.CurrentDirectory, "appsettings.json");
+#endif
 
         if (agrs.FirstOrDefault() != null)
         {

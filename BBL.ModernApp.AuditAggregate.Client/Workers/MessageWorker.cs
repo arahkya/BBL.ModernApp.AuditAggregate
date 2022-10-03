@@ -37,6 +37,12 @@ public class MessageWorker
         {
             while (_dataChannel.Reader.TryRead(out PayloadMessage? payloadMessage))
             {
+                if (!_clientOption.Filters.Operations.Contains(payloadMessage.OperationName))
+                {
+                    Log.Verbose($"Not processing Message ({payloadMessage?.DisplayMessage ?? "N/A"}) it not he Filters.Operations appsettings.json list");
+                    continue;
+                }
+
                 Log.Information($"Processing Message ({payloadMessage?.DisplayMessage ?? "N/A"})");
 
                 Thread threadProcess = new Thread(startThreadDbDealer);
