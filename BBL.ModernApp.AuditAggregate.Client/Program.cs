@@ -31,7 +31,7 @@ public class Program
         configure.Bind(clientOption);
 
         ServiceCollection services = new ServiceCollection();
-        services.AddSingleton<Channel<PayloadMessage>>((ServiceProvider) => Channel.CreateUnbounded<PayloadMessage>());
+        services.AddSingleton<Channel<PayloadMessage>>((ServiceProvider) => Channel.CreateBounded<PayloadMessage>(clientOption.ThreadLimit));
         services.AddScoped<ClientOption>((serviceProvider) => clientOption);
         services.AddScoped<DbDealer>();
         services.AddSingleton<ListenerWorker>();

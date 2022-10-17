@@ -5,6 +5,7 @@ using BBL.ModernApp.AuditAggregate.Client.Config;
 using BBL.ModernApp.AuditAggregate.Contracts;
 using Confluent.Kafka;
 using Serilog;
+using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace BBL.ModernApp.AuditAggregate.Workers;
 
@@ -28,6 +29,7 @@ public class ListenerWorker
 
     public void Stop()
     {
+        _consumer.Unsubscribe();        
         _consumer.Close();
         _consumer.Dispose();
         _bgWorker.CancelAsync();

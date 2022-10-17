@@ -37,7 +37,7 @@ public class MessageWorker
         {
             while (_dataChannel.Reader.TryRead(out PayloadMessage? payloadMessage))
             {
-                if (!_clientOption.Filters.Operations.Contains(payloadMessage.OperationName))
+                if (_clientOption.Filters.Operations.Contains(payloadMessage.OperationName))
                 {
                     Log.Verbose($"Not processing Message ({payloadMessage?.DisplayMessage ?? "N/A"}) it not he Filters.Operations appsettings.json list");
                     continue;
